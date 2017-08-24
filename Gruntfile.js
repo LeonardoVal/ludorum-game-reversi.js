@@ -6,7 +6,7 @@ module.exports = function (grunt) {
 	});
 
 	require('creatartis-grunt').config(grunt, {
-		sourceNames: ['__prologue__', 'Othello', '__epilogue__'],
+		sourceNames: ['__prologue__', 'Othello', 'heuristics', '__epilogue__'],
 		deps: [
 			{ name: 'creatartis-base', id: 'base',
 				path: 'node_modules/creatartis-base/build/creatartis-base.min.js' },
