@@ -64,7 +64,7 @@ function (base, Sermat, ludorum, ludorum_game_reversi, PlayTesterApp) {
 		.playerMonteCarlo("", true, Infinity, 500)
 		.playerUCT("", true, Infinity, 100)
 		.playerUCT("", true, Infinity, 500)
-		.playerAlfaBeta("", 3, true, 'ludorum_game_reversi.Othello.heuristics.defaultHeuristic')
+		.playerAlfaBeta("", true, 3, 'ludorum_game_reversi.Othello.heuristics.defaultHeuristic')
 		.selects(['player0', 'player1'])
 		.button('resetButton', document.getElementById('reset'), APP.reset.bind(APP))
 		.reset();
