@@ -1,4 +1,4 @@
-﻿/* CSS for the user interface to playtest the Othello implementation. 
+﻿/* CSS for the user interface to playtest the Othello implementation.
 */
 body {
 	font-family: Arial, Helvetica, sans-serif;
@@ -61,17 +61,17 @@ footer {
 	border: 1px solid rgb(0,80,40) !important;
 }
 #board table .ludorum-square-Black {
-	background: rgb(20,170,70) url('othello-black.svg') no-repeat;
+	background: rgb(20,170,70) url('square-black.svg') no-repeat;
 	background-size: 100%;
 }
-#board table .ludorum-square-White { 
-	background: rgb(20,170,70) url('othello-white.svg') no-repeat;
+#board table .ludorum-square-White {
+	background: rgb(20,170,70) url('square-white.svg') no-repeat;
 	background-size: 100%;
 }
-#board table .ludorum-square-move { 
-	background: rgb(20,170,70) url('othello-move.svg') no-repeat;
+#board table .ludorum-square-move {
+	background: rgb(20,170,70) url('square-move.svg') no-repeat;
 	background-size: 100%;
 }
-#board table .ludorum-square-empty { 
+#board table .ludorum-square-empty {
 	background-color: rgb(20,170,70);
 }
