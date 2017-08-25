@@ -3,7 +3,7 @@
 `Othello.heuristics` is a bundle of helper functions to build heuristic evaluation functions for
 this game.
 */
-Othello.heuristics = {
+var heuristics = exports.heuristics = {
 	/** `heuristicFromWeights(weights)` returns an heuristic function that may be used with any
 	heuristic based player. Weights are normalized, so the result is in (-1,+1) (exclusively).
 	*/
@@ -74,10 +74,10 @@ Othello.heuristics = {
 /** The default heuristic combines piece and mobility ratios with weights that ponder corners and
 borders but penalizes the squares next to the corners.
 */
-Othello.heuristics.defaultHeuristic = ludorum.players.HeuristicPlayer.composite(
-	Othello.heuristics.heuristicFromSymmetricWeights(
+heuristics.defaultHeuristic = ludorum.players.HeuristicPlayer.composite(
+	heuristics.heuristicFromSymmetricWeights(
 		[+9,-3,+3,+3, -3,-3,-1,-1, +3,-1,+1,+1, +3,-1,+1,+1]
 	), 0.6,
-	Othello.heuristics.pieceRatio, 0.2,
-	Othello.heuristics.mobilityRatio, 0.2
+	heuristics.pieceRatio, 0.2,
+	heuristics.mobilityRatio, 0.2
 );

@@ -7,6 +7,11 @@
 }});
 require(['creatartis-base', 'sermat', 'ludorum', 'ludorum-game-reversi', 'playtester'],
 function (base, Sermat, ludorum, ludorum_game_reversi, PlayTesterApp) {
+	window.base = base;
+	window.Sermat = Sermat;
+	window.ludorum = ludorum;
+	window.ludorum_game_reversi = ludorum_game_reversi;
+
 	var BasicHTMLInterface = ludorum.players.UserInterface.BasicHTMLInterface;
 
 	/** Custom HTML interface for Othello.
@@ -64,7 +69,7 @@ function (base, Sermat, ludorum, ludorum_game_reversi, PlayTesterApp) {
 		.playerMonteCarlo("", true, Infinity, 500)
 		.playerUCT("", true, Infinity, 100)
 		.playerUCT("", true, Infinity, 500)
-		.playerAlfaBeta("", true, 3, 'ludorum_game_reversi.Othello.heuristics.defaultHeuristic')
+		.playerAlfaBeta("", true, 3, 'ludorum_game_reversi.heuristics.defaultHeuristic')
 		.selects(['player0', 'player1'])
 		.button('resetButton', document.getElementById('reset'), APP.reset.bind(APP))
 		.reset();
