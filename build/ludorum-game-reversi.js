@@ -32,12 +32,12 @@ function __init__(base, Sermat, ludorum) { "use strict";
 	};
 
 
-/** # Othello
+/** # Reversi
 
-Implementation of [Othello (aka Reversi)](http://en.wikipedia.org/wiki/Reversi) for Ludorum.
+Implementation of [Reversi](http://en.wikipedia.org/wiki/Reversi) for Ludorum.
 */
-var Othello = exports.Othello = declare(Game, {
-	name: 'Othello',
+var Reversi = exports.Reversi = declare(Game, {
+	name: 'Reversi',
 
 	/** The constructor takes the `activePlayer` (`"Black"` by default) and a board (initial board
 	by default). The board is represented by an array of two integers and a string:
@@ -50,20 +50,15 @@ var Othello = exports.Othello = declare(Game, {
 	constructor: function Othello(activePlayer, board){
 		Game.call(this, activePlayer);
 		this.board = this.makeBoard.apply(this, board || []);
-		if (!this.moves()) {
-			var opponent = this.opponent();
-			if (this.moves(opponent)) {
-				this.activePlayers = [opponent];
-			}
-		}
 	},
 
 	/** `makeBoard(rows=8, columns=8, string)` is used to build the initial board.
 	*/
-	'dual makeBoard': function makeBoard(rows, columns, string){
+	'dual makeBoard': function makeBoard(rows, columns, string){ //FIXME
 		rows = isNaN(rows) ? 8 : +rows;
 		columns = isNaN(columns) ? 8 : +columns;
-		raiseIf(rows < 4 || columns < 4 || rows % 2 || columns % 2, "An Othello board must have even dimensions greater than 3.");
+		raiseIf(rows < 4 || columns < 4 || rows % 2 || columns % 2,
+			"An Reversi board must have even dimensions greater than 3.");
 		if (typeof string === 'string') {
 			return new CheckerboardFromString(rows, columns, string);
 		} else {
@@ -108,7 +103,7 @@ var Othello = exports.Othello = declare(Game, {
 	/** A move always places a piece in an empty square, if and only if by doing so one or more
 	lines of the opponent's pieces get enclosed between pieces of the active player.
 	*/
-	moves: function moves(player){
+	moves: function moves(player){ //FIXME
 		player = player || this.activePlayer();
 		if (this.hasOwnProperty('__moves'+ player +'__')) {
 			return this['__moves'+ player +'__'];
@@ -197,22 +192,80 @@ var Othello = exports.Othello = declare(Game, {
 	/** The game state serialization simply contains the constructor arguments.
 	*/
 	'static __SERMAT__': {
-		identifier: 'Othello',
+		identifier: exports.__package__ +'.Reversi',
+		serializer: function serialize_Reversi(obj) {
+			return [obj.activePlayer(), [obj.board.height, obj.board.width, obj.board.string]];
+		}
+	}
+}); // declare Reversi.
+
+/** Adding Reversi to `ludorum.games`.
+*/
+ludorum.games.Reversi = Reversi;
+
+/** Sermat serialization.
+*/
+exports.__SERMAT__.include.push(Reversi);
+
+
+/** # Othello
+
+Implementation of the [Othello variant of Reversi](http://www.worldothello.org/?q=content/reversi-versus-othello)
+for Ludorum.
+*/
+var Othello = exports.Othello = declare(Reversi, {
+	name: 'Reversi',
+
+	/** One main difference between Reversi and Othello is that is a player has no moves, the turn
+	passes to the other player. A match ends only when both players cannot move.
+	*/
+	constructor: function Othello(activePlayer, board){
+		Reversi.call(this, activePlayer, board);
+		if (!this.moves()) {
+			var opponent = this.opponent();
+			if (this.moves(opponent)) {
+				this.activePlayers = [opponent];
+			}
+		}
+	},
+
+	/** `makeBoard(rows=8, columns=8, string)` is used to build the initial board. The starting
+	board of Othello is not empty, like Reversi. The four center squares are defined.
+	*/
+	'dual makeBoard': function makeBoard(rows, columns, string){
+		rows = isNaN(rows) ? 8 : +rows;
+		columns = isNaN(columns) ? 8 : +columns;
+		raiseIf(rows < 4 || columns < 4 || rows % 2 || columns % 2, "An Othello board must have even dimensions greater than 3.");
+		if (typeof string === 'string') {
+			return new CheckerboardFromString(rows, columns, string);
+		} else {
+			return new CheckerboardFromString(rows, columns)
+				.__place__([rows / 2, columns / 2 - 1], "W")
+				.__place__([rows / 2 - 1, columns / 2], "W")
+				.__place__([rows / 2, columns / 2], "B")
+				.__place__([rows / 2 - 1, columns / 2 - 1], "B");
+		}
+	},
+
+	// ## Utility methods ##########################################################################
+
+	/** The game state serialization simply contains the constructor arguments.
+	*/
+	'static __SERMAT__': {
+		identifier: exports.__package__ +'.Othello',
 		serializer: function serialize_Othello(obj) {
 			return [obj.activePlayer(), [obj.board.height, obj.board.width, obj.board.string]];
 		}
 	}
 }); // declare Othello.
 
-/** Adding Mancala to `ludorum.games`.
+/** Adding Othello to `ludorum.games`.
 */
 ludorum.games.Othello = Othello;
 
 /** Sermat serialization.
 */
-Othello.__SERMAT__.identifier = exports.__package__ +'.'+ Othello.__SERMAT__.identifier;
 exports.__SERMAT__.include.push(Othello);
-Sermat.include(exports);
 
 
 /** # Heuristics for Mancala
@@ -220,7 +273,7 @@ Sermat.include(exports);
 `Othello.heuristics` is a bundle of helper functions to build heuristic evaluation functions for
 this game.
 */
-Othello.heuristics = {
+var heuristics = exports.heuristics = {
 	/** `heuristicFromWeights(weights)` returns an heuristic function that may be used with any
 	heuristic based player. Weights are normalized, so the result is in (-1,+1) (exclusively).
 	*/
@@ -291,16 +344,18 @@ Othello.heuristics = {
 /** The default heuristic combines piece and mobility ratios with weights that ponder corners and
 borders but penalizes the squares next to the corners.
 */
-Othello.heuristics.defaultHeuristic = ludorum.players.HeuristicPlayer.composite(
-	Othello.heuristics.heuristicFromSymmetricWeights(
+heuristics.defaultHeuristic = ludorum.players.HeuristicPlayer.composite(
+	heuristics.heuristicFromSymmetricWeights(
 		[+9,-3,+3,+3, -3,-3,-1,-1, +3,-1,+1,+1, +3,-1,+1,+1]
 	), 0.6,
-	Othello.heuristics.pieceRatio, 0.2,
-	Othello.heuristics.mobilityRatio, 0.2
+	heuristics.pieceRatio, 0.2,
+	heuristics.mobilityRatio, 0.2
 );
 
 
 // See __prologue__.js
+	Sermat.include(exports);
+	
 	return exports;
 }
 );
