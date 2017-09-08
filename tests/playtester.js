@@ -58,7 +58,8 @@ function (base, Sermat, ludorum, ludorum_game_reversi, PlayTesterApp) {
 	/** PlayTesterApp initialization.
 	*/
 	base.global.APP = new PlayTesterApp(
-		new ludorum_game_reversi.Othello(),
+		//new ludorum_game_reversi.Othello(),
+		new ludorum_game_reversi.Reversi(),
 		new OthelloHTMLInterface(),
 		{ bar: document.getElementsByTagName('footer')[0] },
 		[ludorum_game_reversi]
