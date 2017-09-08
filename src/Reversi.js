@@ -28,11 +28,7 @@ var Reversi = exports.Reversi = declare(Game, {
 		if (typeof string === 'string') {
 			return new CheckerboardFromString(rows, columns, string);
 		} else {
-			return new CheckerboardFromString(rows, columns)
-				.__place__([rows / 2, columns / 2 - 1], "W")
-				.__place__([rows / 2 - 1, columns / 2], "W")
-				.__place__([rows / 2, columns / 2], "B")
-				.__place__([rows / 2 - 1, columns / 2 - 1], "B");
+			return new CheckerboardFromString(rows, columns);
 		}
 	},
 
@@ -66,10 +62,21 @@ var Reversi = exports.Reversi = declare(Game, {
 		"White": [/\.B+W/g, /WB+\./g]
 	},
 
-	/** A move always places a piece in an empty square, if and only if by doing so one or more
-	lines of the opponent's pieces get enclosed between pieces of the active player.
+	/** The board's center is defined by the coordinates of the middle four squares.
 	*/
-	moves: function moves(player){ //FIXME
+	'dual boardCenter': function boardCenter(board) {
+		board = board || this.board;
+		var w = board.width,
+			h = board.height;
+		return [[h/2, w/2-1], [h/2-1, w/2], [h/2, w/2], [h/2-1, w/2-1]];
+	},
+
+	/** A move always places a piece in an empty square. If there are empty square at the center of
+	the board, the active player must place a piece in one of them. Else, a piece can be placed if
+	and only if by doing so one or more lines of the opponent's pieces get enclosed between pieces
+	of the active player.
+	*/
+	moves: function moves(player){
 		player = player || this.activePlayer();
 		if (this.hasOwnProperty('__moves'+ player +'__')) {
 			return this['__moves'+ player +'__'];
@@ -77,18 +84,22 @@ var Reversi = exports.Reversi = declare(Game, {
 		var board = this.board,
 			coords = {},
 			regexps = this.__MOVE_REGEXPS__[player];
-		this.lines(board.height, board.width).forEach(function(line){
-			regexps.forEach(function (regexp) {
-				board.asString(line).replace(regexp, function(m, i){
-					var coord = m.charAt(0) === "." ? line[i] : line[m.length - 1 + i];
-					coords[coord] = coord;
-					return m;
+		var _moves = this.boardCenter().filter(function (coord) {
+				return board.square(coord) === '.';
+			});
+		if (_moves.length < 1) {
+			this.lines(board.height, board.width).forEach(function(line){
+				regexps.forEach(function (regexp) {
+					board.asString(line).replace(regexp, function(m, i){
+						var coord = m.charAt(0) === "." ? line[i] : line[m.length - 1 + i];
+						coords[coord] = coord;
+						return m;
+					});
 				});
 			});
-		});
-		var _moves = [];
-		for (var id in coords) {
-			_moves.push(coords[id]);
+			for (var id in coords) {
+				_moves.push(coords[id]);
+			}
 		}
 		_moves = _moves.length > 0 ? obj(player, _moves) : null;
 		if (arguments.length < 1) {
@@ -97,31 +108,51 @@ var Reversi = exports.Reversi = declare(Game, {
 		return _moves;
 	},
 
+	validMoves: function validMoves(moves) {
+		var allMoves = this.moves();
+		for (var player in allMoves) {
+			if (!moves.hasOwnProperty(player)) {
+				return false;
+			}
+			var validMove = allMoves[player].join('\n').indexOf(moves[player] +'') >= 0;
+			if (!validMove) {
+				return false;
+			}
+		}
+		return true;
+	},
+
 	/** When the active player encloses one or more lines of opponent's pieces between two of its
 	own, all those are turned into active player's pieces.
 	*/
 	next: function next(moves, haps, update) {
 		raiseIf(haps, 'Haps are not required (given ', haps, ')!');
+		if (!this.validMoves(moves)) {
+			raise("Invalid moves "+ JSON.stringify(moves) +"!");
+		}
 		var board = this.board.clone(),
 			activePlayer = this.activePlayer(),
+			move = moves[activePlayer],
 			piece, valid;
-		if (!moves.hasOwnProperty(activePlayer) || !board.isValidCoord(moves[activePlayer])) {
-			throw new Error("Invalid moves "+ JSON.stringify(moves) +"!");
-		} else if (activePlayer == this.players[0]) {
+		if (activePlayer == this.players[0]) {
 			piece = "B";
 			valid = /^W+B/;
 		} else {
 			piece = "W";
 			valid = /^B+W/;
 		}
-		board.walks(moves[activePlayer], Checkerboard.DIRECTIONS.EVERY).forEach(function (walk){
-			var match = valid.exec(board.asString(walk).substr(1));
-			if (match){
-				walk.toArray().slice(0, match[0].length).forEach(function(coord){
-					board.__place__(coord, piece);
-				});
-			}
-		});
+		if (this.boardCenter().join('\n').indexOf(move +'') >= 0) { // Place piece at center.
+			board.__place__(move, piece);
+		} else {
+			board.walks(move, Checkerboard.DIRECTIONS.EVERY).forEach(function (walk){
+				var match = valid.exec(board.asString(walk).substr(1));
+				if (match){
+					walk.toArray().slice(0, match[0].length).forEach(function(coord){
+						board.__place__(coord, piece);
+					});
+				}
+			});
+		}
 		if (update) {
 			this.constructor(this.opponent(), [board.height, board.width, board.string]);
 			return this;
