@@ -1,11 +1,4 @@
-﻿require.config({ paths: {
-	'creatartis-base': 'lib/creatartis-base.min',
-	'sermat': 'lib/sermat-umd',
-	'ludorum': 'lib/ludorum.min',
-	'ludorum-game-reversi': 'lib/ludorum-game-reversi',
-	'playtester': 'lib/playtester-common'
-}});
-require(['creatartis-base', 'sermat', 'ludorum', 'ludorum-game-reversi', 'playtester'],
+﻿require(['creatartis-base', 'sermat', 'ludorum', 'ludorum-game-reversi', 'playtester'],
 function (base, Sermat, ludorum, ludorum_game_reversi, PlayTesterApp) {
 	window.base = base;
 	window.Sermat = Sermat;
@@ -66,10 +59,10 @@ function (base, Sermat, ludorum, ludorum_game_reversi, PlayTesterApp) {
 	);
 	APP.playerUI("You")
 		.playerRandom()
-		.playerMonteCarlo("", true, Infinity, 100)
-		.playerMonteCarlo("", true, Infinity, 500)
-		.playerUCT("", true, Infinity, 100)
-		.playerUCT("", true, Infinity, 500)
+		.playerMonteCarlo("", true, 10)
+		.playerMonteCarlo("", true, 100)
+		.playerUCT("", true, 10)
+		.playerUCT("", true, 100)
 		.playerAlfaBeta("", true, 3, 'ludorum_game_reversi.heuristics.defaultHeuristic')
 		.selects(['player0', 'player1'])
 		.button('resetButton', document.getElementById('reset'), APP.reset.bind(APP))
