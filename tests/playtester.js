@@ -67,4 +67,6 @@ function (base, Sermat, ludorum, ludorum_game_reversi, PlayTesterApp) {
 		.selects(['player0', 'player1'])
 		.button('resetButton', document.getElementById('reset'), APP.reset.bind(APP))
 		.reset();
+}, function (err) {
+	console.error(err);
 }); // require().
