@@ -1,4 +1,6 @@
-/** Package wrapper and layout.
+(function (init) { "use strict";
+			this["ludorum-game-reversi"] = init(this.base,this.Sermat,this.ludorum,this.playtester);
+		}).call(this,/** Package wrapper and layout.
 */
 function __init__(base, Sermat, ludorum) { "use strict";
 // Import synonyms. ////////////////////////////////////////////////////////////////////////////////
@@ -382,5 +384,5 @@ heuristics.defaultHeuristic = ludorum.players.HeuristicPlayer.composite(
 	
 	return exports;
 }
-
-//# sourceMappingURL=ludorum-game-reversi-raw.js.map
+);
+//# sourceMappingURL=ludorum-game-reversi-tag.js.map

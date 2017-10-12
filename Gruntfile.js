@@ -21,8 +21,8 @@ module.exports = function (grunt) {
 				wrapper: 'umd'
 			},
 			build_raw: {
-				fileName: 'build/ludorum-game-reversi-raw',
-				wrapper: 'raw'
+				fileName: 'build/ludorum-game-reversi-tag',
+				wrapper: 'tag'
 			}
 		}
 	});
