@@ -1,9 +1,6 @@
-﻿require(['creatartis-base', 'sermat', 'ludorum', 'ludorum-game-reversi', 'playtester'],
-function (base, Sermat, ludorum, ludorum_game_reversi, PlayTesterApp) {
-	window.base = base;
-	window.Sermat = Sermat;
-	window.ludorum = ludorum;
-	window.ludorum_game_reversi = ludorum_game_reversi;
+require(['require-config'], function (init) { "use strict";
+init(['creatartis-base', 'sermat', 'ludorum', 'playtester', 'ludorum-game-reversi'],
+	function (base, Sermat, ludorum, PlayTesterApp, ludorum_game_reversi) {
 
 	var BasicHTMLInterface = ludorum.players.UserInterface.BasicHTMLInterface;
 
@@ -67,6 +64,5 @@ function (base, Sermat, ludorum, ludorum_game_reversi, PlayTesterApp) {
 		.selects(['player0', 'player1'])
 		.button('resetButton', document.getElementById('reset'), APP.reset.bind(APP))
 		.reset();
-}, function (err) {
-	console.error(err);
+}); // init()
 }); // require().
