@@ -1,5 +1,5 @@
 (function (init) { "use strict";
-			this["ludorum-game-reversi"] = init(this.base,this.Sermat,this.ludorum,this.playtester);
+			this["ludorum-game-reversi"] = init(this.base,this.Sermat,this.ludorum);
 		}).call(this,/** Package wrapper and layout.
 */
 function __init__(base, Sermat, ludorum) { "use strict";
