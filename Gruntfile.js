@@ -1,4 +1,4 @@
-﻿/** Gruntfile for [ludorum-game-connect4.js](http://github.com/LeonardoVal/ludorum-game-connect4.js).
+﻿/** Gruntfile for [ludorum-game-reversi.js](http://github.com/LeonardoVal/ludorum-game-reversi.js).
 */
 module.exports = function (grunt) {
 	grunt.initConfig({
@@ -24,8 +24,12 @@ module.exports = function (grunt) {
 				fileName: 'build/ludorum-game-reversi-tag',
 				wrapper: 'tag'
 			}
+		},
+		connect: {
+			playtester: 'tests/playtester.html'
 		}
 	});
 
 	grunt.registerTask('default', ['build']);
+	grunt.registerTask('playtest', ['compile', 'connect:playtester']);
 };
